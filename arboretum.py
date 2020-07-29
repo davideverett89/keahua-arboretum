@@ -8,12 +8,8 @@ class Arboretum:
         self.coastlines = []
         self.forests = []
         self.mountains = []
-        self.gold_dust_day_gecko = []
-        self.happy_faced_spider = []
-        self.kikakapu = []
-        self.nene_goose = []
-        self.opeapea = []
-        self.pueo = []
-        self.river_dolphin = []
-        self.ulae = []
+
+    def get_list(self, list):
+        source_list = getattr(self, list)
+        return source_list
         

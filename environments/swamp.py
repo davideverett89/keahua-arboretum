@@ -1,5 +1,5 @@
 from attributes import Stagnant
-from .biome import Biome
+from environments import Biome
 
 class Swamp(Biome, Stagnant):
 
@@ -10,17 +10,20 @@ class Swamp(Biome, Stagnant):
     def add_animal(self, animal):
         try:
             if len(self.animals) < self.animal_capacity:
-                if animal.aquatic and animal.current_speed == 0:
-                    self.animals.append(animal)
-                    print(f'{animal.species} was added to the swamp!')
-                    input('Please press enter to continue...')
+                if hasattr(animal, "aquatic") and (hasattr(animal, "current_speed") and animal.current_speed == 0):
+                    if animal.age >= animal.minimum_release_age:
+                        self.animals.append(animal)
+                        print(f'{animal.species} [{animal.id}] was added to the swamp!')
+                        input('Please press enter to continue...')
+                    else:
+                        raise ArithmeticError(f'{animal.species} [{animal.id}] is only {animal.age} months old.  That\'s too young to be released!')
                 else:
-                    raise AttributeError('Cannot add non-aquatic or saltwater animals to a swamp')
+                    raise AttributeError(f'{animal.species} [{animal.id}] cannot live in a swamp!')
             else:
-                animal_accepted = False
-                return animal_accepted
-        except AttributeError as err:
+                raise Exception(f'Not enough room for {animal.species} [{animal.id}]!')
+        except (ArithmeticError, AttributeError, Exception) as err:
             print(err)
+            raise
             input('Press enter to continue...')
 
     def add_plant(self, plant):
@@ -36,5 +39,4 @@ class Swamp(Biome, Stagnant):
                 raise AttributeError('Swamp has already reached plant capacity!')
         except AttributeError as err:
             print(err)
-
             input('Press enter to continue...')

@@ -25,7 +25,11 @@ class Animal(Identifiable):
 
     @property
     def minimum_release_age(self):
-        return self.minimum_release_age
+        return self.__minimum_release_age
+
+    @property
+    def age(self):
+        return self.__age
 
     def feed(self, prey):
         if prey in self.__prey:

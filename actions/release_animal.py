@@ -24,7 +24,7 @@ def build_release_animal_menu():
     print("5. Pueo")
     print("6. 'Ulae")
     print("7. Ope'ape'a")
-    print("8. Happy-Face Spider\u001b[0m")
+    print("8. Happy-Face Spider\u001b[0m\n")
 
 
 def release_animal(arboretum):
@@ -51,30 +51,33 @@ def release_animal(arboretum):
     build_biome_choices(animal, arboretum, True)
 
 
-def build_biome_choices(animal, arboretum, animal_accepted):
-    if animal_accepted == False:
-        print("****   That biome is not large enough   ****")
-        print("****     Please choose another one      ****")
-        print("")
+def build_biome_choices(animal, arboretum, space_available):
     available_biomes = list()
+    if space_available == False:
+        print("****   That biome was not large enough   ****")
+        print("****     Please choose another one      ****\n")
     for (key, value) in arboretum.__dict__.items():
         if type(value) is list:
             for index, biome in enumerate(value):
                 biome.original_index = index
+                biome.arboretum_domain = key
                 available_biomes.append(biome)
 
     if len(available_biomes) == 0:
-        print('There are no biomes available.')
-        input('Please press enter to continue...')
+        print('There are no biomes available.\n')
     else:
+        print(
+        "\u001b[47m\u001b[30;1m+-++-++-++-++-++-++-++-++-++-++-++-++-++-++-++-++-++")
+        print("+ A  V  A  I  L  A   B   L   E    B  I  O  M  E  S +")
+        print(
+            "+-++-++-++-++-++-++-++-++-++-++-++-++-++-++-++-++-++\u001b[0m\n")
         for index, biome in enumerate(available_biomes):
             print(
                 f'{index + 1}. {biome} [{biome.id}] ({len(biome.animals)} animals)')
     handle_biome_choice(available_biomes, animal, arboretum)
 
-
 def handle_biome_choice(available_biomes, animal, arboretum):
-    print("Choose biome to release animal or enter x to go back.")
+    print(f"Choose biome to release {animal.species} [{animal.id}] or enter x to go back.")
     choice = input("> ")
     if choice == "x":
         pass
@@ -82,33 +85,18 @@ def handle_biome_choice(available_biomes, animal, arboretum):
         index = int(choice) - 1
         selected_biome = available_biomes[index]
         original_biome_index = selected_biome.original_index
-        if selected_biome.name == "Coastline":
-            animal_accepted = arboretum.coastlines[original_biome_index].add_animal(
-                animal)
-            if animal_accepted == False:
-                build_biome_choices(animal, arboretum, animal_accepted)
-        if selected_biome.name == "Forest":
-            animal_accepted = arboretum.forests[original_biome_index].add_animal(
-                animal)
-            if animal_accepted == False:
-                build_biome_choices(animal, arboretum, animal_accepted)
-        if selected_biome.name == "Grassland":
-            animal_accepted = arboretum.grasslands[original_biome_index].add_animal(
-                animal)
-            if animal_accepted == False:
-                build_biome_choices(animal, arboretum, animal_accepted)
-        if selected_biome.name == "Mountain":
-            animal_accepted = arboretum.mountains[original_biome_index].add_animal(
-                animal)
-            if animal_accepted == False:
-                build_biome_choices(animal, arboretum, animal_accepted)
-        if selected_biome.name == "River":
-            animal_accepted = arboretum.rivers[original_biome_index].add_animal(
-                animal)
-            if animal_accepted == False:
-                build_biome_choices(animal, arboretum, animal_accepted)
-        if selected_biome.name == "Swamp":
-            animal_accepted = arboretum.swamps[original_biome_index].add_animal(
-                animal)
-            if animal_accepted == False:
-                build_biome_choices(animal, arboretum, animal_accepted)
+        original_arboretum_domain = selected_biome.arboretum_domain
+        try:
+            selected_list = arboretum.get_list(original_arboretum_domain)
+            selected_list[original_biome_index].add_animal(animal)
+        except ArithmeticError:
+            input('Press enter to continue...')
+            pass
+        except AttributeError:
+            input('Press enter to continue...')
+            os.system('cls' if os.name == 'nt' else 'clear')
+            build_biome_choices(animal, arboretum, True)
+        except Exception:
+            input('Press enter to continue...')
+            os.system('cls' if os.name == 'nt' else 'clear')
+            build_biome_choices(animal, arboretum, False)

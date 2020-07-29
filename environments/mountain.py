@@ -1,26 +1,28 @@
-from .biome import Biome
+from environments import Biome
 
 
 class Mountain(Biome):
 
     def __init__(self):
-        Biome.__init__(self, "Mountain", 4, 6, "High Elevation")
+        super().__init__("Mountain", 4, 6, "High Elevation")
 
     def add_animal(self, animal):
         try:
             if len(self.animals) < self.animal_capacity:
-                if animal.is_mammal and animal.wing_count:
-                    self.animals.append(animal)
-                    print(f'{animal.species} was added to the mountain!')
-                    input('Please press enter to continue...')
+                if hasattr(animal, "is_mammal") and hasattr(animal,"wing_count"):
+                    if animal.age >= animal.minimum_release_age:
+                        self.animals.append(animal)
+                        print(f'{animal.species} [{animal.id}] was added to the mountain!')
+                        input('Please press enter to continue...')
+                    else:
+                        raise ArithmeticError(f'{animal.species} [{animal.id}] is only {animal.age} months old.  That\'s too young to be released!')
                 else:
-                    raise AttributeError(
-                        'Cannot add aquatic animals to a mountain environment.')
+                    raise AttributeError(f'{animal.species} [{animal.id}] cannot live on a mountain!')
             else:
-                animal_accepted = False
-                return animal_accepted
-        except AttributeError as err:
+                raise Exception(f'Not enough room for {animal.species} [{animal.id}]!')
+        except (ArithmeticError, AttributeError, Exception) as err:
             print(err)
+            raise
             input('Press enter to continue...')
 
     def add_plant(self, plant):

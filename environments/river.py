@@ -1,30 +1,32 @@
-from .biome import Biome
+from environments import Biome
 
 
 class River(Biome):
 
     def __init__(self):
-        Biome.__init__(self, "River", 6, 12, "Fresh Water")
+        super().__init__("River", 6, 12, "Fresh Water")
 
     def add_animal(self, animal):
         try:
             if len(self.animals) < self.animal_capacity:
-                if hasattr(animal, 'is_euryhaline'):
-                    self.animals.append(animal)
-                    print(f'{animal.species} was added to the river!')
-                    input('Please press enter to continue...')
-                elif animal.aquatic and animal.cell_type == "hypertonic":
-                    self.animals.append(animal)
-                    print(f'{animal.species} was added to the river!')
-                    input('Please press enter to continue...')
+                if animal.age >= animal.minimum_release_age:
+                    if hasattr(animal, 'is_euryhaline'):
+                        self.animals.append(animal)
+                        print(f'{animal.species} [{animal.id}] was added to the river!')
+                        input('Please press enter to continue...')
+                    elif hasattr(animal, 'aquatic') and (hasattr(animal, "cell_type") and animal.cell_type == "hypertonic"):
+                        self.animals.append(animal)
+                        print(f'{animal.species} [{animal.id}] was added to the river!')
+                        input('Please press enter to continue...')
+                    else:
+                        raise AttributeError(f'{animal.species} [{animal.id}] cannot live in a river!')
                 else:
-                    raise AttributeError(
-                        'This animal does not belong in the river!')
+                    raise ArithmeticError(f'{animal.species} [{animal.id}] is only {animal.age} months old.  That\'s too young to be released!')
             else:
-                animal_accepted = False
-                return animal_accepted
-        except AttributeError as err:
+                raise Exception(f'Not enough room for {animal.species} [{animal.id}]!')
+        except (AttributeError, ArithmeticError, Exception) as err:
             print(err)
+            raise
             input('Press enter to continue')
 
     def add_plant(self, plant):
